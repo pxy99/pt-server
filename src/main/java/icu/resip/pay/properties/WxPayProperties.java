@@ -15,12 +15,12 @@ public class WxPayProperties {
     /**
      * 小程序appid
      */
-    private final String appid = "wxcd084ab1c761b405";
+    private final String appid = "";
 
     /**
      * 小程序secret
      */
-    private final String secret = "2efa92e4e527d92965bb20ab23a1d798";
+    private final String secret = "";
 
     /**
      * 小程序支付网关
@@ -30,12 +30,12 @@ public class WxPayProperties {
     /**
      * 商户号
      */
-    private final String mchid = "1622860063";
+    private final String mchid = "";
 
     /**
      * 商户key
      */
-    private final String mchkey = "gsEB9g9B3gcagSRnTP0o81G8GKdmXIG6";
+    private final String mchkey = "";
 
     /**
      * 支付成功回调url

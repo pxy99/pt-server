@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="icu.resip.mapper.TOrderMapper">
+
+    <resultMap id="TOrderResultMap" type="icu.resip.domain.order.TOrder">
+        <id column="id" property="id" />
+        <result column="order_no" property="orderNo" />
+        <result column="uid" property="uid" />
+        <result column="receive_uid" property="receiveUid" />
+        <result column="thing_id" property="thingId" />
+        <result column="amount" property="amount" />
+        <result column="upstairs" property="upstairs" />
+        <result column="weight" property="weight" />
+        <result column="ps" property="ps" />
+        <result column="pick_name" property="pickName" />
+        <result column="pick_phone" property="pickPhone" />
+        <result column="pick_address" property="pickAddress" />
+        <result column="receive_id" property="receiveId" />
+        <result column="receive_address" property="receiveAddress" />
+        <result column="expire_time" property="expireTime" />
+        <result column="money" property="money" />
+        <result column="pay_type" property="payType" />
+        <result column="receive_code" property="receiveCode" />
+        <result column="create_time" property="createTime" />
+        <result column="receive_time" property="receiveTime" />
+        <result column="status" property="status" />
+        <result column="complete_time" property="completeTime" />
+        <result column="cancel_time" property="cancelTime" />
+    </resultMap>
+
+    <resultMap id="OrderVoResultMap" type="icu.resip.entity.OrderVo">
+        <id column="id" property="id" />
+        <result column="order_no" property="orderNo" />
+        <result column="uid" property="uid" />
+        <result column="receive_uid" property="receiveUid" />
+        <result column="receive_phone" property="receivePhone" />
+        <result column="pick_address" property="pickAddress" />
+        <result column="receive_address" property="receiveAddress" />
+        <result column="amount" property="amount" />
+        <result column="money" property="money" />
+        <result column="type" property="thingType" />
+        <result column="receive_code" property="receiveCode" />
+        <result column="status" property="status" />
+        <result column="expire_time" property="expireTime" />
+        <result column="create_time" property="sendTime" />
+    </resultMap>
+
+    <resultMap id="OrderDetailResultMap" type="icu.resip.entity.OrderDetail">
+        <id column="id" property="id" />
+        <result column="order_no" property="orderNo" />
+        <result column="uid" property="uid" />
+        <result column="nick_name" property="nickName" />
+        <result column="avatar_url" property="avatarUrl" />
+        <result column="name" property="name" />
+        <result column="phone" property="phone" />
+        <result column="receive_uid" property="receiveUid" />
+        <result column="receive_phone" property="receivePhone" />
+        <result column="pick_address" property="pickAddress" />
+        <result column="receive_address" property="receiveAddress" />
+        <result column="amount" property="amount" />
+        <result column="weight" property="weight" />
+        <result column="upstairs" property="upstairs" />
+        <result column="money" property="money" />
+        <result column="type" property="thingType" />
+        <result column="receive_code" property="receiveCode" />
+        <result column="create_time" property="sendTime" />
+        <result column="expire_time" property="expireTime" />
+        <result column="pay_type" property="payType" />
+        <result column="ps" property="ps" />
+        <collection property="thingVoList" javaType="java.util.List" ofType="icu.resip.entity.ThingVo">
+            <result column="store_name" property="storeName" />
+            <result column="desc" property="desc" />
+        </collection>
+    </resultMap>
+
+    <insert id="insertOrder" keyProperty="id" useGeneratedKeys="true">
+        insert into take_order (
+            order_no,
+            uid,
+            thing_id,
+            amount,
+            upstairs,
+            weight,
+            ps,
+            pick_name,
+            pick_phone,
+            pick_address,
+            receive_id,
+            receive_address,
+            expire_time,
+            money,
+            pay_type,
+            receive_code,
+            create_time,
+            status,
+            complete_time,
+            cancel_time
+        ) values (
+            #{orderNo},
+            #{uid},
+            #{thingId},
+            #{amount},
+            #{upstairs},
+            #{weight},
+            #{ps},
+            #{pickName},
+            #{pickPhone},
+            #{pickAddress},
+            #{receiveId},
+            #{receiveAddress},
+            #{expireTime},
+            #{money},
+            #{payType},
+            #{receiveCode},
+            #{createTime},
+            #{status},
+            #{completeTime},
+            #{cancelTime}
+        )
+    </insert>
+
+    <insert id="insertTakeOrderThing">
+        insert into take_order_thing (take_order_id, store_name, `desc`)
+        values (#{takeOrderId}, #{storeName}, #{desc})
+    </insert>
+
+    <update id="updateStatus">
+        update take_order
+        set status = #{status},
+            cancel_time = #{cancelTime}
+        where order_no = #{orderNo}
+    </update>
+
+    <update id="receiveOrder">
+        update take_order
+        set receive_uid = #{receiveUid},
+            status = #{status},
+            receive_time = #{receiveTime}
+        where id = #{id}
+    </update>
+
+    <update id="confirmOrder">
+        update take_order
+        set status = #{status},
+            complete_time = #{completeTime}
+        where id = #{id}
+    </update>
+
+    <delete id="cancelOrder">
+        update take_order
+        set status = #{status},
+            cancel_time = #{cancelTime}
+        where id = #{id}
+    </delete>
+
+    <select id="selectByOrderNo" resultMap="TOrderResultMap">
+        select * from take_order where order_no = #{orderNo}
+    </select>
+
+    <select id="listByStatus" resultMap="OrderVoResultMap">
+        select tao.id, tao.order_no, tao.uid, tao.receive_uid, u.phone receive_phone, tao.pick_address,
+               tao.receive_address, tao.amount, tao.money, t.type, tao.receive_code,
+               tao.status, tao.expire_time, tao.create_time
+        from take_order tao
+        left join thing t on tao.thing_id = t.id
+        left join user u on tao.receive_uid = u.id
+        ${where}
+    </select>
+
+    <select id="listDetailByStatus" resultMap="OrderDetailResultMap">
+        SELECT
+            tao.id,
+            tao.order_no,
+            tao.uid,
+            u1.nick_name,
+            u1.avatar_url,
+            ra.`name`,
+            ra.phone,
+            tao.receive_uid,
+            u2.phone receive_phone,
+            tao.pick_address,
+            tao.receive_address,
+            tao.amount,
+            tao.weight,
+            tao.upstairs,
+            tao.money,
+            t.type,
+            tao.receive_code,
+            tao.create_time,
+            tao.expire_time,
+            tao.pay_type,
+            tao.ps,
+            tot.store_name,
+            tot.`desc`
+        FROM
+            take_order tao
+                LEFT JOIN take_order_thing tot ON tao.id = tot.take_order_id
+                LEFT JOIN USER u1 ON tao.uid = u1.id
+                LEFT JOIN USER u2 ON tao.receive_uid = u2.id
+                LEFT JOIN thing t ON tao.thing_id = t.id
+                LEFT JOIN receive_address ra ON tao.receive_id = ra.id
+        WHERE
+            tao.id = #{id}
+    </select>
+
+    <select id="selectByUid" resultMap="TOrderResultMap">
+        select * from take_order where id = #{id} and (uid = #{uid} or receive_uid = #{uid})
+    </select>
+
+</mapper>

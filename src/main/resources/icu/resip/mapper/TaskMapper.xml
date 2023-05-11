@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="icu.resip.mapper.TaskMapper">
+
+    <resultMap id="TaskVoResultMap" type="icu.resip.entity.TaskVo">
+        <result column="id" property="id" />
+        <result column="uid" property="uid" />
+        <result column="nick_name" property="nickName" />
+        <result column="avatar_url" property="avatarUrl" />
+        <result column="pick_address" property="pickAddress" />
+        <result column="receive_address" property="receiveAddress" />
+        <result column="amount" property="amount" />
+        <result column="weight" property="weight" />
+        <result column="money" property="money" />
+        <result column="type" property="thingType" />
+        <result column="create_time" property="sendTime" />
+    </resultMap>
+
+    <select id="listAll" resultMap="TaskVoResultMap">
+        select ta.id, u.id uid, u.nick_name, u.avatar_url, ta.pick_address, ta.receive_address, ta.amount, ta.weight, ta.money, t.type, ta.create_time
+        from take_order ta
+        left join user u on ta.uid = u.id
+        left join thing t on ta.thing_id = t.id
+        <where>
+            ta.`status` = 0
+            <if test="address != null and address != ''">
+                and ta.receive_address like concat('%', #{address}, '%')
+            </if>
+            <if test="minPrice != null and minPrice != ''">
+                and ta.money &gt;= #{minPrice}
+            </if>
+            <if test="maxPrice != null and maxPrice != ''">
+                and ta.money &lt;= #{maxPrice}
+            </if>
+        </where>
+        <if test="orderBy != null and orderBy != ''">
+            ${orderBy}
+        </if>
+    </select>
+
+</mapper>

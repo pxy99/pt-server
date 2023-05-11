@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="icu.resip.mapper.ChatMapper">
+    
+    <resultMap id="ChatListResultMap" type="icu.resip.domain.chat.ChatList">
+        <id column="id" property="id" />
+        <result column="uid" property="uid" />
+        <result column="friend_id" property="friendId" />
+        <result column="friend_window" property="friendWindow" />
+        <result column="unread" property="unread" />
+        <result column="status" property="status" />
+        <result column="weight" property="weight" />
+    </resultMap>
+
+    <resultMap id="ChatListVoResultMap" type="icu.resip.entity.ChatListVo">
+        <id column="id" property="id" />
+        <result column="friend_id" property="friendId" />
+        <result column="friend_name" property="friendName" />
+        <result column="friend_img" property="friendImg" />
+        <result column="unread" property="unread" />
+        <result column="weight" property="weight" />
+    </resultMap>
+
+    <resultMap id="ChatMessageResultMap" type="icu.resip.domain.chat.ChatMessage">
+        <id column="id" property="id" />
+        <result column="from_id" property="fromId" />
+        <result column="to_id" property="toId" />
+        <result column="content" property="content" />
+        <result column="send_time" property="sendTime" />
+        <result column="type" property="type" />
+    </resultMap>
+
+    <resultMap id="ChatMessageVoResultMap" type="icu.resip.entity.ChatMessageVo">
+        <id column="id" property="id" />
+        <result column="from_id" property="fromId" />
+        <result column="from_name" property="fromName" />
+        <result column="from_img" property="fromImg" />
+        <result column="to_id" property="toId" />
+        <result column="to_name" property="toName" />
+        <result column="to_img" property="toImg" />
+        <result column="content" property="content" />
+        <result column="type" property="type" />
+        <result column="send_time" property="sendTime" />
+    </resultMap>
+
+    <insert id="insertList" keyProperty="id" useGeneratedKeys="true">
+        insert into chat_list (uid, friend_id, friend_window, unread, status, weight)
+        values (#{uid}, #{friendId}, #{friendWindow}, #{unread}, #{status}, #{weight})
+    </insert>
+
+    <insert id="saveMessage">
+        insert into chat_message (from_id, to_id, content, send_time, `type`)
+        values (#{fromId}, #{toId}, #{content}, #{sendTime}, #{type})
+    </insert>
+
+    <update id="addUnread">
+        update chat_list
+        set unread = unread + 1
+        where uid = #{uid} and friend_id = #{friendId} and status = false
+    </update>
+
+    <update id="updateFriendWindow">
+        update chat_list
+        set friend_window = #{isWindow}
+        where friend_id = #{uid}
+    </update>
+
+    <update id="clearUnread">
+        update chat_list
+        set unread = 0
+        where uid = #{uid} and friend_id = #{friendId} and status = false
+    </update>
+
+    <update id="updateWeight">
+        update chat_list
+        set weight = #{weight}
+        where id = #{listId}
+    </update>
+
+    <update id="updateStatus">
+        update chat_list
+        set status = #{status}
+        where id = #{listId} and uid = #{uid}
+    </update>
+
+    <select id="findOne" resultMap="ChatListResultMap">
+        select * from chat_list
+        where uid = #{uid} and friend_id = #{friendId} and status = false
+    </select>
+
+    <select id="selectList" resultMap="ChatListVoResultMap">
+        select cl.id, u.id friend_id, u.nick_name friend_name, u.avatar_url friend_img, cl.unread, cl.weight
+        from user u
+        left join chat_list cl on u.id = cl.friend_id
+        where cl.uid = #{uid} and cl.status = false
+        order by cl.weight desc
+    </select>
+
+    <select id="selectLastContent" resultMap="ChatMessageResultMap">
+        select * from chat_message
+        where (from_id = #{fromId} and to_id = #{toId}) or (from_id = #{toId} and to_id = #{fromId})
+        order by send_time desc
+        limit 1
+    </select>
+
+
+    <select id="selectMessage" resultMap="ChatMessageVoResultMap">
+        select cm.id, cm.from_id, u1.nick_name from_name, u1.avatar_url from_img, cm.to_id, u2.nick_name to_name, u2.avatar_url to_img, cm.content, cm.send_time, cm. type
+        from chat_message cm
+        left join user u1 on cm.from_id = u1.id
+        left join user u2 on cm.to_id = u2.id
+        where (from_id = #{fromId} and to_id = #{toId}) or (from_id = #{toId} and to_id = #{fromId})
+        order by cm.send_time asc
+    </select>
+
+    <select id="selectMaxWeight" resultType="java.lang.Integer">
+        select max(weight) from chat_list
+        where uid = #{uid}
+    </select>
+
+</mapper>

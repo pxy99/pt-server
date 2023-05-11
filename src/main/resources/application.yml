@@ -1,0 +1,31 @@
+server:
+  port: 443
+  # ssl证书配置
+  ssl:
+    key-store: classpath:xypt.imgs.space.jks
+    key-store-password: gp4kesz254808
+    key-store-type: JKS
+spring:
+  # 配置datasource数据源
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    password: root
+    username: root
+    url: jdbc:mysql://127.0.0.1:3306/pt?useUnicode=true&characterEncoding=UTF-8&serverTimezone=GMT%2B8
+  # redis服务器地址
+  redis:
+    host: 127.0.0.1
+  # 文件上传限制大小
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 10MB
+      max-request-size: 100MB
+mybatis:
+  configuration:
+    default-fetch-size: 100
+    default-statement-timeout: 3000
+    map-underscore-to-camel-case: true
+    # 日志
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  mapperLocations: classpath:icu/resip/mapper/*Mapper.xml

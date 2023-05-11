@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="icu.resip.mapper.AddressMapper">
+    
+    <resultMap id="AreaAddressResultMap" type="icu.resip.domain.address.AreaAddress">
+        <id column="id" property="id" />
+        <result column="area_id" property="areaId" />
+        <result column="name" property="name" />
+    </resultMap>
+
+    <insert id="insertR" keyProperty="id" useGeneratedKeys="true">
+        insert into receive_address (uid, `name`, phone, area_id, area_address_id, address, defaulted)
+        values (#{uid}, #{name}, #{phone}, #{areaId}, #{areaAddressId}, #{address}, #{defaulted})
+    </insert>
+
+    <update id="updateR">
+        update receive_address
+        set `name` = #{name},
+            phone = #{phone},
+            area_id = #{areaId},
+            area_address_id = #{areaAddressId},
+            address = #{address},
+            defaulted = #{defaulted}
+        where id = #{id} and uid = #{uid}
+    </update>
+
+    <update id="updateDefault">
+        update receive_address
+        set defaulted = #{defaulted}
+        where id = #{id}
+    </update>
+
+    <delete id="deleteR">
+        delete from receive_address where id = #{id} and uid = #{uid}
+    </delete>
+
+    <select id="listR" resultType="icu.resip.entity.AddressVo">
+        select ra.id, ra.uid, ra.`name`, ra.phone, concat(a.`name`, aa.`name`, ra.address) address, ra.defaulted
+        from receive_address ra
+        left join area a on ra.area_id = a.id
+        left join area_address aa on ra.area_address_id = aa.id
+        where ra.uid = #{uid}
+        order by ra.id asc
+    </select>
+
+    <select id="selectAddress" resultType="icu.resip.domain.address.Address">
+        select  id, uid, `name`, phone, area_id, area_address_id, address, defaulted
+        from receive_address
+        where uid = #{uid} and defaulted = #{defaulted}
+    </select>
+
+    <select id="listArea" resultType="icu.resip.domain.address.Area">
+        select id, `name` from area
+    </select>
+    
+    <select id="listAreaAddress" resultMap="AreaAddressResultMap">
+        select id, area_id, `name` from area_address
+        where area_id = #{areaId}
+    </select>
+
+    <select id="selectAddressDefault" resultType="icu.resip.entity.AddressVo">
+        select ra.id, ra.uid, ra.`name`, ra.phone, concat(a.`name`, aa.`name`, ra.address) address, ra.defaulted
+        from receive_address ra
+        left join area a on ra.area_id = a.id
+        left join area_address aa on ra.area_address_id = aa.id
+        where ra.uid = #{uid} and ra.defaulted = #{defaulted}
+    </select>
+
+    <select id="findAddress" resultType="icu.resip.domain.address.Address">
+        select  id, uid, `name`, phone, area_id, area_address_id, address, defaulted
+        from receive_address
+        where id = #{id} and uid = #{uid}
+    </select>
+
+</mapper>

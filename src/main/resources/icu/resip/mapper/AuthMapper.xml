@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="icu.resip.mapper.AuthMapper">
+
+    <resultMap id="AuthFileResultMap" type="icu.resip.domain.uaa.AuthFile">
+        <id column="id" property="id" />
+        <result column="uid" property="uid" />
+        <result column="sfz_z" property="sfzZ" />
+        <result column="sfz_f" property="sfzF" />
+        <result column="xsz_f" property="xszF" />
+        <result column="xsz_x" property="xszX" />
+        <result column="rlz" property="rlz" />
+        <result column="create_time" property="createTime" />
+    </resultMap>
+
+    <insert id="insert">
+        insert into auth_file (uid, sfz_z, sfz_f, xsz_f, xsz_x, rlz, create_time)
+        values (#{uid}, #{sfzZ}, #{sfzF}, #{xszF}, #{xszX}, #{rlz}, #{createTime})
+    </insert>
+
+    <update id="updateAuth">
+        update user
+        set auth = #{auth}
+        where id = #{uid}
+    </update>
+
+    <select id="selectOne" resultMap="AuthFileResultMap">
+        select uid, sfz_z, sfz_f, xsz_f, xsz_x, rlz, create_time
+        from auth_file
+        where uid = #{uid}
+    </select>
+
+</mapper>

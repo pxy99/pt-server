@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="icu.resip.mapper.UserMapper">
+    
+    <resultMap id="OpenResultMap" type="icu.resip.domain.uaa.Open">
+        <id column="id" property="id" />
+        <result column="uid" property="uid" />
+        <result column="wx_openid" property="wxOpenid" />
+    </resultMap>
+
+    <resultMap id="UserInfoResultMap" type="icu.resip.entity.UserInfo">
+        <id column="id" property="id" />
+        <result column="username" property="username" />
+        <result column="nick_name" property="nickName" />
+        <result column="gender" property="gender" />
+        <result column="avatar_url" property="avatarUrl" />
+        <result column="phone" property="phone" />
+        <result column="auth" property="auth" />
+    </resultMap>
+
+    <resultMap id="UserResultMap" type="icu.resip.domain.uaa.User">
+        <id column="id" property="id" />
+        <result column="username" property="username" />
+        <result column="nick_name" property="nickName" />
+        <result column="gender" property="gender" />
+        <result column="avatar_url" property="avatarUrl" />
+        <result column="phone" property="phone" />
+        <result column="balance" property="balance" />
+        <result column="passwd" property="passwd" />
+        <result column="login_ip" property="loginIp" />
+        <result column="login_time" property="loginTime" />
+        <result column="create_time" property="createTime" />
+        <result column="auth" property="auth" />
+        <result column="exist" property="exist" />
+    </resultMap>
+
+    <insert id="insertUser" parameterType="icu.resip.domain.uaa.User" useGeneratedKeys="true" keyProperty="id">
+        insert into user (username, balance, login_ip, login_time, create_time, auth, exist)
+        values (#{username}, #{balance}, #{loginIp}, #{loginTime}, #{createTime}, #{auth}, #{exist})
+    </insert>
+
+    <insert id="insertOpen">
+        insert into open (uid, wx_openid)
+        values (#{uid}, #{wxOpenid})
+    </insert>
+
+    <insert id="insertUserRole">
+        insert into user_role (uid, rid)
+        values (#{uid}, #{rid})
+    </insert>
+
+    <update id="updateUserInfo">
+        update user
+        set login_ip = #{loginIp},
+        login_time = #{loginTime}
+        where id = #{id}
+    </update>
+
+    <update id="updateUser">
+        update user
+        set nick_name = #{nickName},
+        gender = #{gender},
+        avatar_url = #{avatarUrl}
+        where id = #{id}
+    </update>
+
+    <update id="updateNickName">
+        update user set nick_name = #{newName} where id = #{id}
+    </update>
+
+    <update id="updateAvatarUrl">
+        update user set avatar_url = #{avatarUrl} where id = #{id}
+    </update>
+
+    <update id="updateBalance">
+        update user
+        set balance = #{balance}
+        where id = #{uid}
+    </update>
+
+    <update id="updatePasswd">
+        update user
+        set passwd = #{passwd}
+        where id = #{uid}
+    </update>
+
+    <update id="updatePhone">
+        update user
+        set phone = #{phone}
+        where id = #{uid}
+    </update>
+
+    <select id="getOpenByWxOpenId" resultMap="OpenResultMap">
+        select id, uid, wx_openid
+        from open
+        where wx_openid = #{openid}
+    </select>
+
+    <select id="selectUserInfo" resultMap="UserInfoResultMap">
+        select id, username, nick_name, gender, avatar_url, phone, auth
+        from user
+        where id = #{id}
+    </select>
+
+    <select id="selectUserIdByOpenid" resultType="java.lang.Long">
+        select uid from open where wx_openid = #{openid}
+    </select>
+
+    <select id="selectOpenidByUid" resultType="java.lang.String">
+        select wx_openid from open where uid = #{uid}
+    </select>
+
+    <select id="listPermission" resultType="icu.resip.domain.uaa.Permission">
+        select p.* from user_role ur
+        join role_permission rp on ur.rid = rp.role_id
+        join permission p on rp.permission_id = p.id
+        where ur.uid = #{uid}
+    </select>
+
+    <select id="selectUser" resultMap="UserResultMap">
+        select * from user where id = #{uid}
+    </select>
+
+    <select id="selectRoleId" resultType="java.lang.Long">
+        select id from role where sn = #{sn}
+    </select>
+
+    <select id="selectCreateTime" resultMap="UserResultMap">
+        select create_time from user where id = #{uid}
+    </select>
+
+    <select id="selectBalance" resultType="java.math.BigDecimal">
+        select balance from user where id = #{uid}
+    </select>
+
+    <select id="findPasswd" resultType="java.lang.String">
+        select passwd from user where id = #{uid}
+    </select>
+
+</mapper>

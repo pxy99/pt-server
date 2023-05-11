@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="icu.resip.mapper.PayMapper">
+
+    <resultMap id="RechargeOrderResultMap" type="icu.resip.pay.domain.Order">
+        <id column="id" property="id" />
+        <result column="transaction_id" property="transactionId" />
+        <result column="order_no" property="orderNo" />
+        <result column="uid" property="uid" />
+        <result column="name" property="name" />
+        <result column="money" property="money" />
+        <result column="status" property="status" />
+        <result column="reason" property="reason" />
+        <result column="create_time" property="createTime" />
+        <result column="pay_time" property="payTime" />
+    </resultMap>
+
+    <insert id="insert">
+        insert into recharge_order (order_no, uid, `name`, money, status, reason, create_time, pay_time)
+        values (#{orderNo}, #{uid}, #{name}, #{money}, #{status}, #{reason}, #{createTime}, #{payTime})
+    </insert>
+
+    <update id="updateOrder">
+        update recharge_order
+        set transaction_id = #{transactionId},
+            status = #{status},
+            reason = #{reason},
+            pay_time = #{payTime}
+        where order_no = #{orderNo} and uid = #{uid}
+    </update>
+
+    <select id="selectOne" resultMap="RechargeOrderResultMap">
+        select transaction_id, order_no, uid, `name`, money, status, reason, create_time, pay_time
+        from recharge_order
+        where order_no = #{orderNo}
+    </select>
+
+</mapper>
